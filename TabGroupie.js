@@ -45,7 +45,8 @@ var INFO =
         ["tags", {}, ":tgs :tgroup-switch"],
         ["spec", {}, ":tgroup-switch ", ["oa", {}, "targetGroup"]],
         ["description", {},
-            "switch to last viewed tab of a specified group."]],
+            "switch to last viewed tab of a specified group.",
+            "If there is no targetGroup supplied, cycle to the next group."]],
 
     ["item", {},
         ["tags", {}, ":tgt :tgroup-title"],
@@ -72,7 +73,7 @@ let TabGroupie = {
 
 
     getIdByTitle: function getIdByTitle(pattern){
-         for (let i = 0; i < this.TabGroups.length; i+=1){
+        for (let i = 0; i < this.TabGroups.length; i+=1){
             if (this.TabGroups[i].title === pattern)
                 return this.TabGroups[i].id;
         }
@@ -154,7 +155,7 @@ let TabGroupie = {
                 for (let i = 0; i < items.length; i+=1) {
                     let item = items[i];
                     if (item.id === TabGroupie.getIdByTitle(title)){
-//                        alert(item.id);
+//                        commandline.echo(item.id);
                         let activeTab = item.getActiveTab();
                         let index = tabs.allTabs.indexOf(activeTab.tab);
                         config.tabbrowser.mTabContainer.selectedIndex = index;
@@ -163,13 +164,25 @@ let TabGroupie = {
                 }
             });
         }else{
-//            alert("yep your are in the else");
+//            commandline.echo("yep your are in the else");
             tabs.getGroups( function ({ GroupItems }) {
-                let lastGroup = GroupItems.getLastActiveGroupItem();
-//                alert(lastGroup.id);
-                let activeTab = lastGroup.getActiveTab();
+                let curGroup = GroupItems.getActiveGroupItem();
+//                commandline.echo(curGroup.id);
+                let nextGroup = getNext(curGroup.id);
+
+                let activeTab = nextGroup.getActiveTab();
                 let index = tabs.allTabs.indexOf(activeTab.tab);
                 config.tabbrowser.mTabContainer.selectedIndex = index;
+
+                function getNext(curid) {
+                    for (let i = 0; i < TabGroupie.TabGroups.length; i+=1){
+                        if (TabGroupie.TabGroups[i].id === curid) {
+                            let nextIdx = (i + 1) % TabGroupie.TabGroups.length;
+                            let nextGroup = GroupItems.groupItem(TabGroupie.TabGroups[nextIdx].id);
+                            return nextGroup;
+                        }
+                    }
+                }
             });
         }
     },
@@ -247,10 +260,10 @@ group.commands.add(["tgroup-s[witch]", "tgs"],
                     "switch to last viewed tab of a specified group",
                     function (args){
                         if (args[0] != undefined){
-//                            alert("arg:" +  args[0]);
+//                            commandline.echo("arg:" +  args[0]);
                             TabGroupie.switchto("" + args[0]);
                         }else{
-                            TabGroupie.switchto();          // go to last active Group
+                            TabGroupie.switchto();          // cycle to next Group
                         }
                         TabGroupie.init();
                     },
@@ -262,7 +275,7 @@ group.commands.add(["tgroup-s[witch]", "tgs"],
                         }
                     });
 
-group.commands.add(["tgroup-g[et]", "tgg"],
+group.commands.add(["tgroup-g[et]", "tgg"], //note, only takes the index of the tab
                     "get a tab to the current group",
                     function (args){
                         TabGroupie.getTab(args[0]);
