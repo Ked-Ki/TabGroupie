@@ -45,8 +45,10 @@ var INFO =
         ["tags", {}, ":tgs :tgroup-switch"],
         ["spec", {}, ":tgroup-switch ", ["oa", {}, "targetGroup"]],
         ["description", {},
-            "switch to last viewed tab of a specified group.",
-            "If there is no targetGroup supplied, cycle to the next group."]],
+            ["p", {},
+                "switch to last viewed tab of a specified group."],
+            ["p", {},
+                "If there is no targetGroup supplied, cycle to the next group."]]],
 
     ["item", {},
         ["tags", {}, ":tgt :tgroup-title"],
@@ -197,6 +199,11 @@ let TabGroupie = {
             config.tabbrowser.mTabContainer.selectedIndex = tabIndex;
         });
     },
+
+    listGroups: function listGroups(filter){
+        completion.listCompleter("tabGroup", filter); 
+        // FIXME: listed in wrong order
+    },
 }
 
 try{
@@ -286,4 +293,13 @@ group.commands.add(["tgroup-g[et]", "tgg"], //note, only takes the index of the 
                         completer: function (context) {
                             completion.buffer(context);
                         }
+                    });
+
+group.commands.add(["tgroup-l[ist]", "tgl"],
+                    "list all tabgroups",
+                    function (args){
+                        TabGroupie.listGroups(args[0] || "");
+                    },
+                    {
+                        argCount: "?",
                     });
