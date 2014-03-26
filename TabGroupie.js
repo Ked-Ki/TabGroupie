@@ -54,7 +54,13 @@ var INFO =
         ["tags", {}, ":tgt :tgroup-title"],
         ["spec", {}, ":tgroup-title ", ["oa", {}, "newName"]],
         ["description", {},
-            "Sets a new title to the currently used group."]]];
+            "Sets a new title to the currently used group."]]],
+    
+    ["item", {},
+        ["tags", {}, ":tgl :tgroup-list"],
+        ["spec", {}, ":tgroup-title ", ["oa", {}, "filter"]],
+        ["description", {},
+            "Lists all tabgroups matching the filter."]]];
 
 
 let TabGroupie = {
@@ -204,6 +210,7 @@ let TabGroupie = {
         completion.listCompleter("tabGroup", filter); 
         // FIXME: listed in wrong order
     },
+    
 }
 
 try{
